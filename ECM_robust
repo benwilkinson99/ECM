@@ -10,6 +10,7 @@ number_machines = 6
 number_jobs = 4
 number_instances = 100
 process_times = zeros(number_machines, number_jobs, number_instances)
+
 # Normal
 mean_array = zeros(number_machines, number_jobs)
 std_array = zeros(number_machines, number_jobs)

@@ -6,8 +6,8 @@ using Random, Distributions
 using Plots
 
 ###################################### (1) Generatre process times ####################################################################
-number_machines = 5
-number_jobs = 3
+number_machines = 3
+number_jobs = 5
 number_instances = 100
 process_times = zeros(number_machines, number_jobs, number_instances)
 
@@ -76,7 +76,6 @@ MOI.set(m, MOI.Silent(), true)
 @objective(m, Min,cmax)
 optimize!(m)
 h_0 = objective_value(m)
-println(" ")
 println(h_0)
 for i = 1:number_machines
     for j = 1:number_jobs
@@ -94,7 +93,7 @@ for i = 1:number_machines
     allowable_buffer[1,i] = lambda*h_0 - det_starttimes_data[i,1,1] - sum(process_times[i,j,1] for j = 1:number_jobs)
 end
 total_allowable_buffer = sum(allowable_buffer[1,i] for i = 1:number_machines)
-buffer_increment = 0.05*total_allowable_buffer
+buffer_increment = 0.1*total_allowable_buffer
 index_b = Int64(round((total_allowable_buffer)/buffer_increment)) + 1
 
 global h_i = zeros(1,index_b)
@@ -130,12 +129,12 @@ for buff_iter = 1:index_b
     @constraint(m, [i=1:number_machines,j=1:number_jobs,k=1:number_jobs], starttime_order[i,j] <= start_times[i,k] + (1 - X[k,j])*10000)
     @constraint(m, [i=1:number_machines], buffer_order[i,number_jobs] <= 0)
     @constraint(m, starttime_order[1,1] == 0)
-    @constraint(m, [i=1:number_machines-1], starttime_order[i+1,1] == starttime_order[i,1] + process_order[i,1]) # First job
+    @constraint(m, [i=1:number_machines-1], starttime_order[i+1,1] == starttime_order[i,1] + process_order[i,1] + buffer_order[i,1]) # First job
     @constraint(m, [i=1:number_jobs-1], starttime_order[1,i+1] == starttime_order[1,i] + process_order[1,i] + buffer_order[1,i])   # First machine
     @constraint(m, [i=1:number_machines-1,j=1:number_jobs-1], starttime_order[i+1,j+1] >= starttime_order[i+1,j] + process_order[i+1,j] + buffer_order[i+1,j])
-    @constraint(m, [k=1:number_machines-1,i=1:number_jobs-1], starttime_order[k+1,i+1] >= starttime_order[k,i+1] + process_order[k,i+1])
+    @constraint(m, [k=1:number_machines-1,i=1:number_jobs-1], starttime_order[k+1,i+1] >= starttime_order[k,i+1] + process_order[k,i+1] + buffer_order[k,i+1])
     @constraint(m, [i=1:number_machines-1,j=1:number_jobs-1], starttime_order[i+1,j+1] <= starttime_order[i+1,j] + process_order[i+1,j] + 10000*Bin[i,j] + buffer_order[i+1,j])
-    @constraint(m, [i=1:number_machines-1,j=1:number_jobs-1], starttime_order[i+1,j+1] <= starttime_order[i,j+1] + process_order[i,j+1] + 10000*(1 - Bin[i,j]))
+    @constraint(m, [i=1:number_machines-1,j=1:number_jobs-1], starttime_order[i+1,j+1] <= starttime_order[i,j+1] + process_order[i,j+1] + 10000*(1 - Bin[i,j]) + buffer_order[i,j+1])
     @constraint(m, cmax == starttime_order[number_machines,number_jobs] + process_order[number_machines,number_jobs] + buffer_order[number_machines,number_jobs])
     @constraint(m, sum(sum(buffer_order[i,j] for i = 1:number_machines) for j = 1:number_jobs-1) == buffer_increment*(buff_iter-1))
     @objective(m, Min,cmax)
@@ -168,13 +167,14 @@ for buff_iter = 1:index_b
         @constraint(m, [i=1:number_machines,j=1:number_jobs,k=1:number_jobs], buffer_order[i,j] >= buffer[i,k] - (1 - X[k,j])*10000)
         @constraint(m, [i=1:number_machines,j=1:number_jobs,k=1:number_jobs], starttime_order[i,j] <= start_times[i,k] + (1 - X[k,j])*10000)
         @constraint(m, starttime_order[1,1] == 0)
-        @constraint(m, [i=1:number_machines-1], starttime_order[i+1,1] == starttime_order[i,1] + process_order[i,1]) # First job
+        @constraint(m, [i=1:number_machines-1], starttime_order[i+1,1] == starttime_order[i,1] + process_order[i,1] + buffer_order[i,1]) # First job
         @constraint(m, [i=1:number_jobs-1], starttime_order[1,i+1] == starttime_order[1,i] + process_order[1,i] + buffer_order[1,i])   # First machine
         @constraint(m, [i=1:number_machines-1,j=1:number_jobs-1], starttime_order[i+1,j+1] >= starttime_order[i+1,j] + process_order[i+1,j] + buffer_order[i+1,j])
-        @constraint(m, [k=1:number_machines-1,i=1:number_jobs-1], starttime_order[k+1,i+1] >= starttime_order[k,i+1] + process_order[k,i+1])
+        @constraint(m, [k=1:number_machines-1,i=1:number_jobs-1], starttime_order[k+1,i+1] >= starttime_order[k,i+1] + process_order[k,i+1] + buffer_order[k,i+1])
         @constraint(m, [i=1:number_machines-1,j=1:number_jobs-1], starttime_order[i+1,j+1] <= starttime_order[i+1,j] + process_order[i+1,j] + 10000*Bin[i,j] + buffer_order[i+1,j])
-        @constraint(m, [i=1:number_machines-1,j=1:number_jobs-1], starttime_order[i+1,j+1] <= starttime_order[i,j+1] + process_order[i,j+1] + 10000*(1 - Bin[i,j]))
+        @constraint(m, [i=1:number_machines-1,j=1:number_jobs-1], starttime_order[i+1,j+1] <= starttime_order[i,j+1] + process_order[i,j+1] + 10000*(1 - Bin[i,j]) + buffer_order[i,j+1])
         @constraint(m, sum(sum(buffer_order[i,j] for i = 1:number_machines) for j = 1:number_jobs-1) == buffer_increment*(buff_iter-1))
+        @constraint(m, sum(buffer_order[i,number_jobs] for i = 1:number_machines) == 0)
         @constraint(m, cmax == starttime_order[number_machines,number_jobs] + process_order[number_machines,number_jobs] + buffer_order[number_machines,number_jobs])
         @constraint(m, cmax >= h_i[1,buff_iter]*(1 + (lambda_index - 1)*lambda_increment))
         @objective(m, Min,cmax)
@@ -196,15 +196,15 @@ for buff_iter = 1:index_b
         MOI.set(m, MOI.Silent(), true)
         @variable(m, start_times[i=1:number_machines,j=1:number_jobs,k=1:number_instances-1] >= 0)
         @variable(m, cmax[i=1:number_instances-1] >= 0)
-        @variable(m, X[i=1:number_jobs,j=1:number_jobs,k=1:number_instances-1], Bin)
+        @variable(m, X[i=1:number_jobs,j=1:number_jobs], Bin)
         @variable(m, process_order[i=1:number_machines,j=1:number_jobs,k=1:number_instances-1] >= 0)
         @variable(m, starttime_order[i=1:number_machines,j=1:number_jobs,k=1:number_instances-1] >= 0)
         @variable(m, Bin[i=1:number_machines,j=1:number_jobs,k=1:number_instances-1], Bin)
         @variable(m, obj_prob[i=1:number_instances-1], Bin)
-        @constraint(m, [i=1:number_jobs,k=1:number_instances-1], sum(X[i,j,k] for j=1:number_jobs) == 1)
-        @constraint(m, [i=1:number_jobs,k=1:number_instances-1], sum(X[j,i,k] for j=1:number_jobs) == 1)
-        @constraint(m, [i=1:number_instances-1], process_order[:,:,i] .== process_times[:,:,i+1]*X[:,:,i])
-        @constraint(m, [i=1:number_machines,j=1:number_jobs,k=1:number_jobs,z=1:number_instances-1], starttime_order[i,j,z] <= start_times[i,k,z] + (1 - X[k,j,z])*10000)
+        @constraint(m, [i=1:number_jobs], sum(X[i,j] for j=1:number_jobs) == 1)
+        @constraint(m, [i=1:number_jobs], sum(X[j,i] for j=1:number_jobs) == 1)
+        @constraint(m, [i=1:number_instances-1], process_order[:,:,i] .== process_times[:,:,i+1]*X)
+        @constraint(m, [i=1:number_machines,j=1:number_jobs,k=1:number_jobs,z=1:number_instances-1], starttime_order[i,j,z] <= start_times[i,k,z] + (1 - X[k,j])*10000)
         @constraint(m, [z=1:number_instances-1],starttime_order[1,1,z] == 0)
         @constraint(m, [i=1:number_machines-1,j=1:number_instances-1], starttime_order[i+1,1,j] == starttime_order[i,1,j] + process_order[i,1,j]) # First job
         @constraint(m, [i=1:number_jobs-1,j=1:number_instances-1], starttime_order[1,i+1,j] == starttime_order[1,i,j] + process_order[1,i,j]) # First machine

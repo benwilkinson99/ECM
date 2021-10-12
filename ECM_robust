@@ -6,12 +6,12 @@ using Random, Distributions
 using Plots
 
 ###################################### (1) Generatre process times ####################################################################
-number_machines = 6
-number_jobs = 4
+number_machines = 5
+number_jobs = 3
 number_instances = 100
 process_times = zeros(number_machines, number_jobs, number_instances)
 
-# Normal
+# Normal distribution
 mean_array = zeros(number_machines, number_jobs)
 std_array = zeros(number_machines, number_jobs)
 for k = 2:number_instances
@@ -31,7 +31,7 @@ for i = 1:number_machines
     end
 end
 
-# Triangle
+# Triangle distribution
 min_array = zeros(number_machines, number_jobs)
 max_array = zeros(number_machines, number_jobs)
 mid_array = zeros(number_machines, number_jobs)
@@ -188,7 +188,6 @@ for buff_iter = 1:index_b
     lambda_iters_resized = Int64(lambda_iters - number_infeasible[1,buff_iter])
     #global cmax_grid = cmax_grid[:,1:lambda_iters_resized, buff_iter]
 
-# Folloing may just be calculations, based on the same sequence?
 ###################################### (6) Calculate Pr(Failure) for cmax grid ####################################################################
     #cmax_store = zeros(number_instances-1, lambda_iters_resized, index_b)
     #prob_store = zeros(1,lambda_iters_resized,index_b)
@@ -240,7 +239,7 @@ norm_buff_grid = zeros(1,lambda_iters,resized_index_b)
 norm_prob_grid = zeros(1,lambda_iters,resized_index_b)
 
 ans - min/max-min + 1
-for i = 1:resized_index_b
+#for i = 1:resized_index_b
 
 
 example_output = zeros(Int64(total_feasible),3)

@@ -234,11 +234,12 @@ for i = 1:resized_index_b
 end
 total_feasible = sum(feasibility)
 
-norm_cmax_grid = zeros(1,lambda_iters,resized_index_b)
-norm_buff_grid = zeros(1,lambda_iters,resized_index_b)
-norm_prob_grid = zeros(1,lambda_iters,resized_index_b)
 
-ans - min/max-min + 1
+#norm_cmax_grid = zeros(1,lambda_iters,resized_index_b)
+#norm_buff_grid = zeros(1,lambda_iters,resized_index_b)
+#norm_prob_grid = zeros(1,lambda_iters,resized_index_b)
+
+#ans - min/max-min + 1
 #for i = 1:resized_index_b
 
 

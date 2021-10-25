@@ -51,7 +51,6 @@ for k = 1:number_instances
 end
 process_times[:,:,1] = mid_array
 
-
 ###################################### (2) Calculating h_0 (Deterministic Cmax) ####################################################################
 det_starttimes_data = zeros(number_machines,number_jobs)
 m = Model(CPLEX.Optimizer)

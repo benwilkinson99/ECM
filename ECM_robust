@@ -87,6 +87,7 @@ lambda = 1.5
 lambda_increment = 0.02
 lambda_iters = Int64(round((lambda - 1)/lambda_increment)) + 1
 
+
 allowable_buffer = zeros(1,number_machines)
 for i = 1:number_machines
     allowable_buffer[1,i] = lambda*h_0 - det_starttimes_data[i,1,1] - sum(process_times[i,j,1] for j = 1:number_jobs)
@@ -94,6 +95,7 @@ end
 total_allowable_buffer = sum(allowable_buffer[1,i] for i = 1:number_machines)
 buffer_increment = 0.05*total_allowable_buffer
 index_b = Int64(round((total_allowable_buffer)/buffer_increment)) + 1
+
 
 global h_i = zeros(1,index_b)
 global cmax_grid = zeros(1,lambda_iters, index_b)

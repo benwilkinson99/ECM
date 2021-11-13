@@ -265,3 +265,59 @@ for i = 1:resized_index_b
     end
 end
 writedlm("3d_data.txt", example_output)
+
+
+full_archive = zeros(lambda_iters,index_b,3)
+for i = 1:lambda_iters
+    for j = 1:index_b
+        full_archive[i,j,1] = buffer_grid[1,i,j]
+    end
+end
+for i = 1:lambda_iters
+    for j = 1:index_b
+        full_archive[i,j,2] = cmax_grid[1,i,j]
+    end
+end
+for i = 1:lambda_iters
+    for j = 1:index_b
+        full_archive[i,j,3] = prob_store[1,i,j]
+    end
+end
+
+dominate_label = zeros(lambda_iters,index_b)
+for row = 1:lambda_iters
+    for col = 1:index_b
+        if dominate_label[row,col] == 0
+            for j = 1:lambda_iters
+                for k = 1:index_b
+                    if dominate_label[j,k] == 0
+                        if row != j && col != k
+                            test_a = 0
+                            test_b = 0
+                            for z = 1:3
+                                if full_archive[row,col,z] < full_archive[j,k,z]
+                                    test_a += 1
+                                    test_b = 1
+                                elseif full_archive[row,col,z] <= full_archive[j,k,z]
+                                    test_a += 1
+                                end
+                            end
+                            if test_a == 3 && test_b == 1
+                                dominate_label[j,k] = 1
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+global dom_count = 0
+for i = 1:lambda_iters
+    for j = 1:index_b
+        if dominate_label[i,j] == 0
+            global dom_count += 1
+        end
+    end
+end

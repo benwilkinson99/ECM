@@ -267,6 +267,7 @@ end
 writedlm("3d_data.txt", example_output)
 
 
+################################# Testing for domination #######################################################
 full_archive = zeros(lambda_iters,index_b,3)
 for i = 1:lambda_iters
     for j = 1:index_b

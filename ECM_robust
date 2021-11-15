@@ -292,7 +292,7 @@ for row = 1:lambda_iters
             for j = 1:lambda_iters
                 for k = 1:index_b
                     if dominate_label[j,k] == 0
-                        if row != j && col != k
+                        if row != j || col != k
                             test_a = 0
                             test_b = 0
                             for z = 1:3

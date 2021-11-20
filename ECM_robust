@@ -225,6 +225,12 @@ for buff_iter = 1:index_b
 end
 
 ###################################### (7) Exporting to text file for plotting ####################################################################
+#norm_cmax_grid = zeros(1,lambda_iters,resized_index_b)
+#norm_buff_grid = zeros(1,lambda_iters,resized_index_b)
+#norm_prob_grid = zeros(1,lambda_iters,resized_index_b)
+#ans - min/max-min + 1
+#for i = 1:resized_index_b
+
 resized_index_b = index_b - infeasible_increments
 number_infeasible = number_infeasible[1,1:resized_index_b]'
 feasibility = zeros(1,resized_index_b)
@@ -232,15 +238,6 @@ for i = 1:resized_index_b
     feasibility[1,i] = lambda_iters - number_infeasible[1,i]
 end
 total_feasible = sum(feasibility)
-
-#norm_cmax_grid = zeros(1,lambda_iters,resized_index_b)
-#norm_buff_grid = zeros(1,lambda_iters,resized_index_b)
-#norm_prob_grid = zeros(1,lambda_iters,resized_index_b)
-
-#ans - min/max-min + 1
-#for i = 1:resized_index_b
-
-
 
 example_output = zeros(Int64(total_feasible),3)
 global e_i = 1
@@ -319,6 +316,34 @@ for i = 1:lambda_iters
     for j = 1:index_b
         if dominate_label[i,j] == 0
             global dom_count += 1
+        end
+    end
+end
+
+global index_dom = 1
+semi_archive = zeros(dom_count,3)
+for i = 1:lambda_iters
+    for j = 1:index_b
+        if dominate_label[i,j] == 0
+            #global semi_archive[index_dom,1] = full_archive[i,j,1]
+            #semi_archive[index_dom,2] = full_archive[i,j,2]
+            #semi_archive[index_dom,3] = full_archive[i,j,3]
+            #global index_dom += 1
+            println(full_archive[i,j,1])
+            println(full_archive[i,j,2])
+            println(full_archive[i,j,3])
+            println("WWWWWWWWWWWWWWWWWWWW")
+        end
+    end
+end
+
+
+for i = 1:lambda_iters
+    for j = 1:index_b
+        if full_archive[i,j,1] == 0 && full_archive[i,j,2] == 0 && full_archive[i,j,3] == 0
+            println(i)
+            println(i)
+            println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW")
         end
     end
 end

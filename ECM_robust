@@ -340,7 +340,7 @@ end
 
 for i = 1:lambda_iters
     for j = 1:index_b
-        if full_archive[i,j,1] == 0 && full_archive[i,j,2] == 0 && full_archive[i,j,3] == 0
+        if full_archive[i,j,3] == 0
             println(i)
             println(i)
             println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW")

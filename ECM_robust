@@ -5,7 +5,7 @@ using DelimitedFiles
 using Random, Distributions
 using Plots
 
-###################################### (1) Generatre process times ####################################################################
+###################################### (1) Generate process times ####################################################################
 number_machines = 3
 number_jobs = 5
 number_instances = 100

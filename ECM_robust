@@ -337,7 +337,6 @@ for i = 1:lambda_iters
         if full_archive[i,j,3] == 0
             println(i)
             println(i)
-            println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW")
         end
     end
 end
